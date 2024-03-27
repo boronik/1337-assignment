@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -18,7 +19,10 @@ public class LinkTraverser {
 	private final FileDownloader fileDownloader;
 	private final LocalDiskUtil fileUtil;
 
-	public LinkTraverser() {
+	private ExecutorService executorService;
+
+	public LinkTraverser(ExecutorService executorService) {
+		this.executorService = executorService;
 		this.fileDownloader = new NioFileDownloader();
 		this.fileUtil = new LocalDiskUtil();
 	}
@@ -32,8 +36,6 @@ public class LinkTraverser {
 			visited.add(uri);
 		}
 
-		System.out.println(format("Traversing uri: %s", uri));
-
 		// Download and parse the contents of the uri
 		Document doc = Jsoup.connect(uri.toString()).get();
 
@@ -41,44 +43,45 @@ public class LinkTraverser {
 		fileUtil.save(doc.html(), root.resolve(uri.getPath().substring(1)));
 
 		// Download styles
-		doc.select("link[href]").stream()
-			.map(s -> uri.resolve(s.attr("href")))
-			.forEach(source -> downloadAndLogErrors(root, source));
+		doc.select("link[href]").stream().map(s -> uri.resolve(s.attr("href")))
+				.forEach(source -> downloadAndLogErrors(root, source));
 
 		// Download scripts
-		doc.select("script[src]").stream()
-			.map(e -> uri.resolve(e.attr("src")))
-			.forEach(source -> downloadAndLogErrors(root, source));
+		doc.select("script[src]").stream().map(e -> uri.resolve(e.attr("src")))
+				.forEach(source -> downloadAndLogErrors(root, source));
 
 		// Download images
-		doc.select("img[src]").stream()
-			.map(e -> uri.resolve(e.attr("src")))
-			.forEach(source -> downloadAndLogErrors(root, source));
+		doc.select("img[src]").stream().map(e -> uri.resolve(e.attr("src")))
+				.forEach(source -> downloadAndLogErrors(root, source));
 
 		// Traverse sub-links recursively
-		doc.select("a[href]").stream()
-			.map(l -> uri.resolve(l.attr("href")))
-			.forEach(elementUri -> {
-				try {
-					traverse(elementUri, root);
-				} catch (Exception ex) {
-					// Log and continue traversing the rest of the links
-					System.err.println(format("Could not traverse file: %s", ex.getMessage()));
+		doc.select("a[href]").stream().map(l -> uri.resolve(l.attr("href"))).forEach(elementUri -> {
+			executorService.execute(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						traverse(elementUri, root);
+					} catch (Exception ex) {
+						// Log and continue traversing the rest of the links
+						System.err.println(format("Could not traverse file: %s", ex.getMessage()));
+					}
 				}
+			});
 		});
 	}
 
 	private void downloadAndLogErrors(Path root, URI source) {
-		try
-		{
+		try {
 			Path destination = root.resolve(source.getPath().substring(1));
 			if (Files.exists(destination)) {
 				return;
 			}
 
-			fileDownloader.download(source, destination);
-		}
-		catch (Exception ex) {
+			fileDownloader.download(executorService, source, destination, new IDownloaderCallback() {
+				public void start(URI source) {
+				}
+			});
+		} catch (Exception ex) {
 			// Log in and continue downloading the rest of the site
 			System.err.println(format("Could not download file: %s, error: %s", source, ex.getMessage()));
 		}

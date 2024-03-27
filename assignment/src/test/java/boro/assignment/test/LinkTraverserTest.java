@@ -1,5 +1,9 @@
 package boro.assignment.test;
 
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.jupiter.api.BeforeEach;
 
 import boro.assignment.LinkTraverser;
@@ -14,6 +18,8 @@ public class LinkTraverserTest {
 
 	@BeforeEach
 	void setup() {
-		traverser = new LinkTraverser();
+		ThreadPoolExecutor executorService = new ThreadPoolExecutor(1, 1, 10L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+		executorService.allowCoreThreadTimeOut(true);
+		traverser = new LinkTraverser(executorService);
 	}
 }
