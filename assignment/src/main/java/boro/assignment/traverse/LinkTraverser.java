@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
@@ -43,8 +44,6 @@ public class LinkTraverser {
 
 		// Download and parse the contents of the uri
 		Document doc = Jsoup.connect(uri.toString()).get();
-
-		System.out.println(format("%s - Download file success: %s", Thread.currentThread().getName(), uri));
 
 		// Save the content to disk
 		fileUtil.save(doc.html(), root.resolve(uri.getPath().substring(1)));
@@ -82,10 +81,23 @@ public class LinkTraverser {
 		if (Files.exists(destination)) {
 			return;
 		}
-
 		fileDownloader.download(executorService, source, destination, new IDownloaderCallback() {
+			public void success(URI source) {
+				animateProgress();
+			}
 			public void start(URI source) {
 			}
 		});
+	}
+
+	private void animateProgress() {
+		try {
+			String anim= "|/-\\";
+			int x = new Random().nextInt(5);
+			String data = "\r" + anim.charAt(x % anim.length());
+			System.out.write(data.getBytes());
+		} catch (IOException e) {
+			//Ignore
+		}
 	}
 }
