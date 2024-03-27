@@ -1,4 +1,4 @@
-package boro.assignment;
+package boro.assignment.download;
 
 import static java.lang.String.format;
 

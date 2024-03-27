@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import boro.assignment.LocalDiskUtil;
+import boro.assignment.util.LocalDiskUtil;
 
 public class LocalDiskUtilTest {
 	private LocalDiskUtil util;

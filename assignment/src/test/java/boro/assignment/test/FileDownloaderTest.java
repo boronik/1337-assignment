@@ -16,9 +16,9 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import boro.assignment.FileDownloader;
-import boro.assignment.IDownloaderCallback;
-import boro.assignment.NioFileDownloader;
+import boro.assignment.download.FileDownloader;
+import boro.assignment.download.IDownloaderCallback;
+import boro.assignment.download.NioFileDownloader;
 
 public class FileDownloaderTest {
 	private FileDownloader downloader;

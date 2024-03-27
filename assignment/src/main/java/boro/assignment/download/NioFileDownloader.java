@@ -1,4 +1,4 @@
-package boro.assignment;
+package boro.assignment.download;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

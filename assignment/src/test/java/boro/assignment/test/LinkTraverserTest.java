@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 
-import boro.assignment.LinkTraverser;
+import boro.assignment.traverse.LinkTraverser;
 
 public class LinkTraverserTest {
 	//Not sure how to verify LinkTraverser (would take some time to figure that out)
