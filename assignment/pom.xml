@@ -5,6 +5,11 @@
 	<groupId>com.1337</groupId>
 	<artifactId>assignment</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+
+	<properties>
+		<exec.mainClass>boro.assignment.Program</exec.mainClass>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -18,4 +23,17 @@
 			<version>1.12.1</version>
 		</dependency>
 	</dependencies>
+
+	<build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <mainClass>boro.assignment.Program</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
