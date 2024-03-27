@@ -39,6 +39,8 @@ public class LinkTraverser {
 		// Download and parse the contents of the uri
 		Document doc = Jsoup.connect(uri.toString()).get();
 
+		System.out.println(format("%s - Download file success: %s", Thread.currentThread().getName(), uri));
+
 		// Save the content to disk
 		fileUtil.save(doc.html(), root.resolve(uri.getPath().substring(1)));
 
@@ -71,19 +73,14 @@ public class LinkTraverser {
 	}
 
 	private void downloadAndLogErrors(Path root, URI source) {
-		try {
-			Path destination = root.resolve(source.getPath().substring(1));
-			if (Files.exists(destination)) {
-				return;
-			}
-
-			fileDownloader.download(executorService, source, destination, new IDownloaderCallback() {
-				public void start(URI source) {
-				}
-			});
-		} catch (Exception ex) {
-			// Log in and continue downloading the rest of the site
-			System.err.println(format("Could not download file: %s, error: %s", source, ex.getMessage()));
+		Path destination = root.resolve(source.getPath().substring(1));
+		if (Files.exists(destination)) {
+			return;
 		}
+
+		fileDownloader.download(executorService, source, destination, new IDownloaderCallback() {
+			public void start(URI source) {
+			}
+		});
 	}
 }
